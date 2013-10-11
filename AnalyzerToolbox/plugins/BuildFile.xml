@@ -1,16 +1,17 @@
-<use name="CondFormats/JetMETObjects"/>
+<library name="JetAnalyzer" file="*.cc"></library>
+<use name="boost"/>
+<use name="FWCore/Framework"/>
 <use name="DataFormats/Common"/>
 <use name="DataFormats/FWLite"/>
 <use name="DataFormats/GeometryVector"/>
 <use name="DataFormats/Math"/>
 <use name="DataFormats/PatCandidates"/>
 <use name="FWCore/Common"/>
-<use name="FWCore/Framework"/>
 <use name="FWCore/PluginManager"/>
 <use name="FWCore/ParameterSet"/>
 <use name="FWCore/PythonParameterSet"/>
+<use name="FWCore/ServiceRegistry"/>
 <use name="fastjet"/>
 <use name="rootphysics"/>
 <use name="rootrflx"/>
-<flags CXXFLAGS="-O0 -g -DDEBUG"/>
-<flags EDM_PLUGIN="1"/>
+<use name="PhysicsTools/UtilAlgos"/>
