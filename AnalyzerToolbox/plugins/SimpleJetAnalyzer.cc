@@ -61,8 +61,12 @@ SimpleJetAnalyzer::analyze(const edm::Event& event, const edm::EventSetup& setup
   edm::Handle<edm::View<pat::Jet> > jets;
   event.getByLabel(jets_,jets);
 
-  edm::Handle<edm::ValueMap<float> > qgMLP;
-  event.getByLabel("qgMLP",qgMLP);
+  edm::Handle<edm::ValueMap<float> > tau1;
+  event.getByLabel("Njettiness","tau1",tau1);
+
+  edm::Handle<edm::ValueMap<float> > qgLikelihood;
+  event.getByLabel("QGTagger","qgLikelihood",qgLikelihood);
+
 
   // loop jets
   for(edm::View<pat::Jet>::const_iterator jet=jets->begin(); jet!=jets->end(); ++jet){
@@ -71,7 +75,8 @@ SimpleJetAnalyzer::analyze(const edm::Event& event, const edm::EventSetup& setup
     edm::RefToBase<pat::Jet> jetRef(edm::Ref<edm::View<pat::Jet>>(jets,ijet));
 
     std::cout<<"jet->eta(): "<<jet->eta()<<std::endl;
-    std::cout<<"qgMLP: "<<(*qgMLP)[jetRef]<<std::endl;
+    std::cout<<"tau1: "<<(*tau1)[jetRef]<<std::endl;
+    std::cout<<"qgLikelihood: "<<(*qgLikelihood)[jetRef]<<std::endl;
     std::cout<<std::endl;
   }
   // jet multiplicity
