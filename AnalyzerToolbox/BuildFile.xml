@@ -12,5 +12,12 @@
 <use name="fastjet"/>
 <use name="rootphysics"/>
 <use name="rootrflx"/>
-<flags CXXFLAGS="-O0 -g -DDEBUG"/>
-<flags EDM_PLUGIN="1"/>
+<use   name="roottmva"/>
+<use   name="root"/>
+<use   name="rootcore"/>
+<use   name="DataFormats/ParticleFlowCandidate"/>
+<use   name="DataFormats/JetReco"/>
+<export>
+  <lib   name="1"/>
+</export>
+<Flags CXXFLAGS="-g" />
