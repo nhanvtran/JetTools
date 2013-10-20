@@ -58,18 +58,20 @@ SimpleJetAnalyzer::SimpleJetAnalyzer(const edm::ParameterSet& cfg):
 void
 SimpleJetAnalyzer::analyze(const edm::Event& event, const edm::EventSetup& setup)
 {
-  edm::Handle<pat::Jet> jets;
-  event.getByLabel(jets_, jets);
+  edm::Handle<edm::View<pat::Jet> > jets;
+  event.getByLabel(jets_,jets);
 
-  edm::Handle<edm::ValueMap<float>> tau1;
+  edm::Handle<edm::ValueMap<float> > qgMLP;
+  event.getByLabel("qgMLP",qgMLP);
 
   // loop jets
-  for (pat::Jet::const_iterator jet = jets->begin();  jet != jets->end(); ++jet){
+  for(edm::View<pat::Jet>::const_iterator jet=jets->begin(); jet!=jets->end(); ++jet){
+
     int ijet = jet - jets->begin();
-    edm::RefToBase<reco::Jet> jetRef(edm::Ref<pat::Jet>(jets,ijet));
+    edm::RefToBase<pat::Jet> jetRef(edm::Ref<edm::View<pat::Jet>>(jets,ijet));
 
     std::cout<<"jet->eta(): "<<jet->eta()<<std::endl;
-    std::cout<<"tau1: "<<(*tau1)[jetRef]<<std::endl;
+    std::cout<<"qgMLP: "<<(*qgMLP)[jetRef]<<std::endl;
     std::cout<<std::endl;
   }
   // jet multiplicity
