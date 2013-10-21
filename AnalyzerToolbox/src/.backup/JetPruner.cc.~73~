@@ -1,0 +1,251 @@
+// -*- C++ -*-
+//
+// Package:    JetTools/AnalyzerToolbox
+// Class:      JetPruner
+// 
+/**\class JetPruner JetPruner.cc JetTools/AnalyzerToolbox/src/JetPruner.cc
+
+Description: [one line class summary]
+
+Implementation:
+[Notes on implementation]
+*/
+//
+// Original Author:  John Stupak
+//         Created:  Sun Sep 22 18:31:27 CDT 2013
+// $Id$
+//
+//
+
+
+// system include files
+#include <memory>
+
+// user include files
+#include "FWCore/Framework/interface/Frameworkfwd.h"
+#include "FWCore/Framework/interface/EDProducer.h"
+
+#include "FWCore/Framework/interface/Event.h"
+#include "FWCore/Framework/interface/MakerMacros.h"
+
+#include "DataFormats/PatCandidates/interface/Jet.h"
+#include "FWCore/ParameterSet/interface/ParameterSet.h"
+
+#include <fastjet/JetDefinition.hh>
+#include <fastjet/PseudoJet.hh>
+#include <fastjet/ClusterSequence.hh>
+#include "fastjet/tools/Pruner.hh"
+
+#include <cstdlib>
+#include <iostream>
+
+//
+// class declaration
+//
+
+class JetPruner : public edm::EDProducer {
+public:
+  JetPruner();
+  explicit JetPruner(const edm::ParameterSet&);
+  ~JetPruner();
+
+  static void fillDescriptions(edm::ConfigurationDescriptions& descriptions);
+
+  void prune(pat::Jet theJet, const std::vector<fastjet::PseudoJet> thePseudoJet);
+
+private:
+  virtual void beginJob() ;
+  virtual void produce(edm::Event&, const edm::EventSetup&);
+  virtual void endJob() ;
+      
+  virtual void beginRun(edm::Run&, edm::EventSetup const&);
+  virtual void endRun(edm::Run&, edm::EventSetup const&);
+  virtual void beginLuminosityBlock(edm::LuminosityBlock&, edm::EventSetup const&);
+  virtual void endLuminosityBlock(edm::LuminosityBlock&, edm::EventSetup const&);
+
+  // ----------member data ---------------------------
+  
+  std::cout<<"A"<<std::endl;
+  fastjet::JetDefinition jetAlg_;
+  std::cout<<"B"<<std::endl;
+
+  double RcutFactor_;
+  double zCut_;
+
+  std::cout<<"C"<<std::endl;
+  fastjet::Pruner *pruner_;
+  std::cout<<"D"<<std::endl;
+
+
+};
+
+//
+// constants, enums and typedefs
+//
+
+
+//
+// static data member definitions
+//
+
+//
+// constructors and destructor
+//
+
+JetPruner::JetPruner(){}
+
+JetPruner::JetPruner(const edm::ParameterSet& iConfig)
+{
+  //produces<std::vector<pat::Jet> >();
+
+  std::string jetAlgString=iConfig.getParameter<std::string>("pruningJetAlg");
+  /*fastjet::JetAlgorithm {
+    fastjet::kt_algorithm = 0, fastjet::cambridge_algorithm = 1, fastjet::antikt_algorithm = 2, fastjet::genkt_algorithm = 3,
+    fastjet::cambridge_for_passive_algorithm = 11, fastjet::genkt_for_passive_algorithm = 13, fastjet::ee_kt_algorithm = 50, fastjet::ee_genkt_algorithm = 53,
+    fastjet::plugin_algorithm = 99
+    }
+  */
+  std::cout<<"E"<<std::endl;
+  if(jetAlgString=="KT") jetAlg_=fastjet::kt_algorithm;
+  if (jetAlgString=="CA") jetAlg_=fastjet::cambridge_algorithm;
+  if (jetAlgString=="AK") jetAlg_=fastjet::antikt_algorithm;
+  std::cout<<"F"<<std::endl;
+
+  RcutFactor_=iConfig.getParameter<double>("RcutFactor");
+  zCut_=iConfig.getParameter<double>("zCut");
+
+  std::cout<<"G"<<std::endl;
+  pruner_= new fastjet::Pruner(jetAlg_, zCut_, RcutFactor_);
+  std::cout<<"H"<<std::endl;
+
+}
+
+
+JetPruner::~JetPruner()
+{
+ 
+  // do anything here that needs to be done at desctruction time
+  // (e.g. close files, deallocate resources etc.)
+
+}
+
+
+//
+// member functions
+//
+
+// ------------ method called to produce the data  ------------
+void
+JetPruner::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
+{
+  using namespace edm;
+
+
+  /*
+  // read input collection
+  edm::Handle<edm::View<pat::Jet> > jets;
+   
+  // prepare room for output
+  std::vector<pat::Jet> outJets;   outJets.reserve(jets->size());
+
+  for ( typename edm::View<pat::Jet>::const_iterator jetIt = jets->begin() ; jetIt != jets->end() ; ++jetIt ) {
+  std::vector<fastjet::PseudoJet> j;
+
+  std::vector<reco::PFCandidatePtr> constituents=jetIt->getPFConstituents();
+  for ( std::vector<reco::PFCandidatePtr>::const_iterator constituentIt = constituents->begin() ; constituentIt != constituents->end() ; ++constituentIt ) {
+  LorentzVector lv=constituentIt->p4();
+  fastjet::PseudoJet c=fastjet::PseudoJet(lv->px(), lv->py, lv->pz(), lv->energy());
+  j->push_back(c);
+  }
+
+  double R = 0.8;
+  fastjet::JetDefinition jet_def(fastjet::cambridge_algorithm, R);
+  fastjet::ClusterSequence cs(input_particles, jet_def);
+  vector<fastjet::PseudoJet> jets = sorted_by_pt(cs.inclusive_jets());
+
+     
+  fastjet::PseudoJet prunedJet=pruner(jets[0]);
+   
+  pat::Jet outJet(*jetIt);
+  outJet.addUserFloat("prunedMass", prunedJet.m());
+   
+  outJets.push_back(outJet);
+  std::auto_ptr<std::vector<pat::Jet> > out(new std::vector<pat::Jet>(outJets));
+  iEvent.put(out);
+  */
+}
+
+void JetPruner::prune(pat::Jet theJet, const std::vector<fastjet::PseudoJet> thePseudoJet)
+{
+  std::cout<<"I"<<std::endl;
+  fastjet::PseudoJet prunedJet=(*pruner_)(thePseudoJet[0]);
+  std::cout<<"J"<<std::endl;
+
+  double prunedMass=prunedJet.m(); 
+  std::cout<<prunedMass<<std::endl;
+  theJet.addUserFloat("prunedMass",prunedMass);
+  std::cout<<theJet.userFloat("prunedMass")<<std::endl;
+
+  std::vector<fastjet::PseudoJet> kept_subjets = prunedJet.pieces();
+  
+  double largest_mass_subjet = 0;
+  for (size_t i = 0; i < kept_subjets.size(); i++)
+    {
+      if ( kept_subjets[i].m() > largest_mass_subjet )
+	{
+	  largest_mass_subjet = kept_subjets[i].m();
+	}
+    }
+  
+  double massDrop=1;
+  if ( prunedMass!=0 ) massDrop = largest_mass_subjet / prunedMass;
+  theJet.addUserFloat("massDrop",massDrop);
+}
+
+// ------------ method called once each job just before starting event loop  ------------
+void 
+JetPruner::beginJob()
+{
+}
+
+// ------------ method called once each job just after ending the event loop  ------------
+void 
+JetPruner::endJob() {
+}
+
+// ------------ method called when starting to processes a run  ------------
+void 
+JetPruner::beginRun(edm::Run&, edm::EventSetup const&)
+{
+}
+
+// ------------ method called when ending the processing of a run  ------------
+void 
+JetPruner::endRun(edm::Run&, edm::EventSetup const&)
+{
+}
+
+// ------------ method called when starting to processes a luminosity block  ------------
+void 
+JetPruner::beginLuminosityBlock(edm::LuminosityBlock&, edm::EventSetup const&)
+{
+}
+
+// ------------ method called when ending the processing of a luminosity block  ------------
+void 
+JetPruner::endLuminosityBlock(edm::LuminosityBlock&, edm::EventSetup const&)
+{
+}
+
+// ------------ method fills 'descriptions' with the allowed parameters for the module  ------------
+void
+JetPruner::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
+  //The following says we do not know what parameters are allowed so do no validation
+  // Please change this to state exactly what you do use, even if it is no parameters
+  edm::ParameterSetDescription desc;
+  desc.setUnknown();
+  descriptions.addDefault(desc);
+}
+
+//define this as a plug-in
+DEFINE_FWK_MODULE(JetPruner);
