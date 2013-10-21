@@ -52,20 +52,14 @@ addJetCollection(process,
                  doJetID = False
                  )
 
-#-------------------------------------------------------------------------------
 
-process.Njettiness = cms.EDProducer("NjettinessAdder",
-                               src=cms.InputTag("selectedPatJetsCA8PF"),
-                               cone=cms.double(0.5)
-                               )
-
-#-------------------------------------------------------------------------------
-
-process.load('JetTools.AnalyzerToolbox.QGTagger_RecoJets_cff')
-
+process.load('JetTools.AnalyzerToolbox.AnalyzerJetToolbox_cff')
+process.Njettiness.src = cms.InputTag("selectedPatJetsCA8PF")
+process.Njettiness.cone = cms.double(0.8)
 process.QGTagger.srcJets = cms.InputTag("selectedPatJetsCA8PF")
 process.QGTagger.useCHS  = cms.untracked.bool(True)
 process.QGTagger.isPatJet = cms.untracked.bool(True)
+
 #-------------------------------------------------------------------------------
 
 # Let it run
@@ -75,8 +69,7 @@ process.p = cms.Path(
     + process.patDefaultSequence
     + process.goodPatJetsPFlow
     + process.selectedPatJetsCA8PF
-    + process.Njettiness
-    + process.QuarkGluonTagger
+    + process.AnalyzerJetToolbox
 )
 
 #-------------------------------------------------------------------------------
