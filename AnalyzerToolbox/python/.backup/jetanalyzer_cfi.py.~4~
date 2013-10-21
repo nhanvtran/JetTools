@@ -1,9 +1,0 @@
-import FWCore.ParameterSet.Config as cms
-
-CA8JetAnalyzer = cms.EDAnalyzer(
-    'JetAnalyzer'
-    jetSrc = cms.string(""),
-    jetAlg = cms.string("CambridgeAachen"),
-    jetSize = cms.double(0.8),
-    
-)
