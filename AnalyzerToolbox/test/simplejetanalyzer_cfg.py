@@ -8,21 +8,21 @@ process.source = cms.Source("PoolSource",
 
 process.maxEvents = cms.untracked.PSet(
     input = cms.untracked.int32( -1 )
-)
+    )
 
 ## Message logger configuration
 process.load("FWCore.MessageLogger.MessageLogger_cfi")
 
 ## Analyze jets
 process.analyzePatJets = cms.EDAnalyzer("SimpleJetAnalyzer",
-                                src  = cms.InputTag("selectedPatJetsCA8PF")
-                                )
+                                        src  = cms.InputTag("selectedPatJetsCA8PF")
+                                        )
 
 ## Define output file
 process.TFileService = cms.Service("TFileService",
-  fileName = cms.string('out.root')
-)
+                                   fileName = cms.string('out.root')
+                                   )
 
 process.p = cms.Path(
     process.analyzePatJets
-)
+    )

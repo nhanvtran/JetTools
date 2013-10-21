@@ -67,7 +67,6 @@ SimpleJetAnalyzer::analyze(const edm::Event& event, const edm::EventSetup& setup
   edm::Handle<edm::ValueMap<float> > qgLikelihood;
   event.getByLabel("QGTagger","qgLikelihood",qgLikelihood);
 
-
   // loop jets
   for(edm::View<pat::Jet>::const_iterator jet=jets->begin(); jet!=jets->end(); ++jet){
 
