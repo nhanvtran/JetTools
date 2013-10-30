@@ -10,26 +10,24 @@
 #include "DataFormats/PatCandidates/interface/Jet.h"
 
 class NjettinessAdder : public edm::EDProducer { 
-public:
+ public:
   explicit NjettinessAdder(const edm::ParameterSet& iConfig) :
     src_(iConfig.getParameter<edm::InputTag>("src")),
     cone_(iConfig.getParameter<double>("cone"))
-    {
-    produces<std::vector<pat::Jet> >("jets");
-    produces<edm::ValueMap<float> >("tau1");
-    produces<edm::ValueMap<float> >("tau2");
-    produces<edm::ValueMap<float> >("tau3");
-  }
-  
-  virtual ~NjettinessAdder() {}
-  
-  void produce(edm::Event & iEvent, const edm::EventSetup & iSetup) ;
-  float getTau(int num,edm::Ptr<pat::Jet> object) const;
-
-private:	
-  edm::InputTag src_ ;
-  double cone_ ;
+      {
+	produces<edm::ValueMap<float> >("tau1");
+	produces<edm::ValueMap<float> >("tau2");
+	produces<edm::ValueMap<float> >("tau3");
+      }
+    
+    virtual ~NjettinessAdder() {}
+    
+    void produce(edm::Event & iEvent, const edm::EventSetup & iSetup) ;
+    float getTau(int num,edm::Ptr<reco::PFJet> object) const;
+    
+ private:	
+    edm::InputTag src_ ;
+    double cone_ ;
 };
-
 
 #endif
