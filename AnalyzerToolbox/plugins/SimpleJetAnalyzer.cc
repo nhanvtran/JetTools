@@ -59,6 +59,16 @@ void
 SimpleJetAnalyzer::analyze(const edm::Event& event, const edm::EventSetup& setup)
 {
   edm::Handle<edm::View<pat::Jet> > jets;
+  event.getByLabel(jets_,jets); 
+  for( edm::View<pat::Jet>::const_iterator jet_iter = jets->begin();
+       jet_iter !=jets->end(); ++jet_iter)
+    {
+      float tau1 = jet_iter->userFloat("Njettiness:tau1");
+      std::cout<<tau1<<std::endl;
+    }
+
+  /*
+  edm::Handle<edm::View<pat::Jet> > jets;
   event.getByLabel(jets_,jets);
 
   edm::Handle<edm::ValueMap<float> > tau1;
@@ -75,13 +85,14 @@ SimpleJetAnalyzer::analyze(const edm::Event& event, const edm::EventSetup& setup
 
     std::cout<<"jet->eta(): "<<jet->eta()<<std::endl;
     std::cout<<"tau1: "<<(*tau1)[jetRef]<<std::endl;
-    std::cout<<"qgLikelihood: "<<(*qgLikelihood)[jetRef]<<std::endl;
+    //std::cout<<"qgLikelihood: "<<(*qgLikelihood)[jetRef]<<std::endl;
     std::cout<<std::endl;
   }
   // jet multiplicity
   fill( "mult" , jets->size());
   // invariant dijet mass for first two leading jets
   if(jets->size()>1){ fill( "mass", ((*jets)[0].p4()+(*jets)[1].p4()).mass());}
+  */
 }
 
 #include "FWCore/Framework/interface/MakerMacros.h"
