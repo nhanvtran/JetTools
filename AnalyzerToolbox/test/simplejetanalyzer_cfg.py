@@ -15,7 +15,7 @@ process.load("FWCore.MessageLogger.MessageLogger_cfi")
 
 ## Analyze jets
 process.analyzePatJets = cms.EDAnalyzer("SimpleJetAnalyzer",
-                                        src  = cms.InputTag("selectedPatJetsCA8PF")
+                                        src  = cms.InputTag("patJets")
                                         )
 
 ## Define output file
