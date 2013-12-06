@@ -1,4 +1,4 @@
-#include "JetTools/AnalyzerToolbox/plugins/NjettinessAdder.h"
+#include "JetTools/AnalyzerToolbox/interface/NjettinessAdder.h"
 #include "JetTools/AnalyzerToolbox/interface/Njettiness.hh"
 
 #include "FWCore/Framework/interface/MakerMacros.h"

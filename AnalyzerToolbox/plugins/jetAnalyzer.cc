@@ -5,10 +5,10 @@
 // 
 /**\class jetAnalyzer jetAnalyzer.cc tmp/jetAnalyzer/plugins/jetAnalyzer.cc
 
- Description: [one line class summary]
+Description: [one line class summary]
 
- Implementation:
-     [Notes on implementation]
+Implementation:
+[Notes on implementation]
 */
 //
 // Original Author:  John Stupak
@@ -31,30 +31,45 @@
 
 #include "DataFormats/PatCandidates/interface/Jet.h"
 
+#include "FWCore/ServiceRegistry/interface/Service.h"
+#include "CommonTools/UtilAlgos/interface/TFileService.h"
+#include "TH1.h"
+#include "TFile.h"
+
 //
 // class declaration
 //
 
 class jetAnalyzer : public edm::EDAnalyzer {
-   public:
-      explicit jetAnalyzer(const edm::ParameterSet&);
-      ~jetAnalyzer();
+public:
+  explicit jetAnalyzer(const edm::ParameterSet&);
+  ~jetAnalyzer();
 
-      static void fillDescriptions(edm::ConfigurationDescriptions& descriptions);
+  static void fillDescriptions(edm::ConfigurationDescriptions& descriptions);
 
 
-   private:
-      virtual void beginJob() override;
-      virtual void analyze(const edm::Event&, const edm::EventSetup&) override;
-      virtual void endJob() override;
+private:
+  virtual void beginJob() override;
+  virtual void analyze(const edm::Event&, const edm::EventSetup&) override;
+  virtual void endJob() override;
+  
+  //virtual void beginRun(edm::Run const&, edm::EventSetup const&) override;
+  //virtual void endRun(edm::Run const&, edm::EventSetup const&) override;
+  //virtual void beginLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&) override;
+  //virtual void endLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&) override;
 
-      //virtual void beginRun(edm::Run const&, edm::EventSetup const&) override;
-      //virtual void endRun(edm::Run const&, edm::EventSetup const&) override;
-      //virtual void beginLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&) override;
-      //virtual void endLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&) override;
-
-      // ----------member data ---------------------------
+  // ----------member data ---------------------------
   edm::InputTag* jets_;
+  
+  TH1F* h_tau1 = new TH1F("tau1",";#tau_{1}",25,0,1);
+  TH1F* h_tau2 = new TH1F("tau2",";#tau_{2}",25,0,1);
+  TH1F* h_tau3 = new TH1F("tau3",";#tau_{3}",25,0,1);
+
+  TH1F* h_cutbasedDiscriminant = new TH1F("cutbasedDiscriminant",";cutbasedDiscriminant",25,0,1);
+  TH1F* h_fullDiscriminant = new TH1F("fullDiscriminant",";fullDiscriminant",25,0,1);
+
+  TH1F* h_cutbasedId = new TH1F("cutbasedId",";cutbasedId",8,-0.5,7.5);
+  TH1F* h_fullId = new TH1F("fullId",";fullId",8,-0.5,7.5);
 };
 
 //
@@ -71,18 +86,16 @@ class jetAnalyzer : public edm::EDAnalyzer {
 jetAnalyzer::jetAnalyzer(const edm::ParameterSet& iConfig)
 
 {
-   //now do what ever initialization is needed
+  //now do what ever initialization is needed
   jets_=new edm::InputTag(iConfig.getParameter<edm::InputTag>("src"));
-
-
 }
 
 
 jetAnalyzer::~jetAnalyzer()
 {
  
-   // do anything here that needs to be done at desctruction time
-   // (e.g. close files, deallocate resources etc.)
+  // do anything here that needs to be done at desctruction time
+  // (e.g. close files, deallocate resources etc.)
 
 }
 
@@ -95,28 +108,57 @@ jetAnalyzer::~jetAnalyzer()
 void
 jetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
-   using namespace edm;
+  using namespace edm;
 
-   edm::Handle<edm::View<pat::Jet> > jets;
-   iEvent.getByLabel(*jets_,jets);
-   //iEvent.getByLabel(iConfig.getParameter<edm::InputTag>("src"),jets);
-   for( edm::View<pat::Jet>::const_iterator jet_iter = jets->begin();
-	jet_iter !=jets->end(); ++jet_iter)
-     {
-       float tau1 = jet_iter->userFloat("Njettiness:tau1");
-       std::cout<<tau1<<std::endl;
-     }
-   /*
-#ifdef THIS_IS_AN_EVENT_EXAMPLE
-   Handle<ExampleData> pIn;
-   iEvent.getByLabel("example",pIn);
-#endif
+  edm::Handle<edm::View<pat::Jet> > jets;
+  iEvent.getByLabel(*jets_,jets);
+
+  for( edm::View<pat::Jet>::const_iterator jet_iter = jets->begin();
+       jet_iter !=jets->end(); ++jet_iter)
+    {
+      float tau1 = jet_iter->userFloat("Njettiness:tau1");
+      float tau2 = jet_iter->userFloat("Njettiness:tau2");
+      float tau3 = jet_iter->userFloat("Njettiness:tau3");
+
+      float cutbasedDiscriminant = jet_iter->userFloat("pileupJetIdEvaluator:cutbasedDiscriminant");
+      int cutbasedId = jet_iter->userInt("pileupJetIdEvaluator:cutbasedId");
+       
+      float fullDiscriminant = jet_iter->userFloat("pileupJetIdEvaluator:fullDiscriminant");
+      int fullId = jet_iter->userInt("pileupJetIdEvaluator:fullId");
+
+      h_tau1->Fill(tau1);
+      h_tau2->Fill(tau2);
+      h_tau3->Fill(tau3);
+
+      h_cutbasedDiscriminant->Fill(cutbasedDiscriminant);
+      h_fullDiscriminant->Fill(fullDiscriminant);
+      
+      h_cutbasedId->Fill(cutbasedId);
+      h_fullId->Fill(fullId);
+      
+      std::cout<<"tau1:"<<tau1<<std::endl;
+      std::cout<<"tau2:"<<tau2<<std::endl;
+      std::cout<<"tau3:"<<tau3<<std::endl;
+
+      std::cout<<"cutbasedDiscriminant:"<<cutbasedDiscriminant<<std::endl;
+      std::cout<<"cutbasedId:"<<cutbasedId<<std::endl;
+
+      std::cout<<"fullDiscriminant:"<<fullDiscriminant<<std::endl;
+      std::cout<<"fullId:"<<fullId<<std::endl;
+
+      std::cout<<std::endl;
+    }
+  /*
+    #ifdef THIS_IS_AN_EVENT_EXAMPLE
+    Handle<ExampleData> pIn;
+    iEvent.getByLabel("example",pIn);
+    #endif
    
-#ifdef THIS_IS_AN_EVENTSETUP_EXAMPLE
-   ESHandle<SetupData> pSetup;
-   iSetup.get<SetupRecord>().get(pSetup);
-#endif
-   */
+    #ifdef THIS_IS_AN_EVENTSETUP_EXAMPLE
+    ESHandle<SetupData> pSetup;
+    iSetup.get<SetupRecord>().get(pSetup);
+    #endif
+  */
 }
 
 
@@ -130,38 +172,51 @@ jetAnalyzer::beginJob()
 void 
 jetAnalyzer::endJob() 
 {
+  TFile* f=new TFile("hists.root","RECREATE");
+
+  h_tau1->Write();
+  h_tau2->Write();
+  h_tau3->Write();
+
+  h_cutbasedDiscriminant->Write();
+  h_fullDiscriminant->Write();
+
+  h_cutbasedId->Write();
+  h_fullId->Write();
+
+  f->Close();
 }
 
 // ------------ method called when starting to processes a run  ------------
 /*
-void 
-jetAnalyzer::beginRun(edm::Run const&, edm::EventSetup const&)
-{
-}
+  void 
+  jetAnalyzer::beginRun(edm::Run const&, edm::EventSetup const&)
+  {
+  }
 */
 
 // ------------ method called when ending the processing of a run  ------------
 /*
-void 
-jetAnalyzer::endRun(edm::Run const&, edm::EventSetup const&)
-{
-}
+  void 
+  jetAnalyzer::endRun(edm::Run const&, edm::EventSetup const&)
+  {
+  }
 */
 
 // ------------ method called when starting to processes a luminosity block  ------------
 /*
-void 
-jetAnalyzer::beginLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&)
-{
-}
+  void 
+  jetAnalyzer::beginLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&)
+  {
+  }
 */
 
 // ------------ method called when ending the processing of a luminosity block  ------------
 /*
-void 
-jetAnalyzer::endLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&)
-{
-}
+  void 
+  jetAnalyzer::endLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&)
+  {
+  }
 */
 
 // ------------ method fills 'descriptions' with the allowed parameters for the module  ------------

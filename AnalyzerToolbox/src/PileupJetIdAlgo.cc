@@ -1,4 +1,4 @@
-#include "JetTools/AnalyzerToolbox/interface/PileupJetIdAlgo.h"
+#include "../interface/PileupJetIdAlgo.h"
 
 #include "DataFormats/PatCandidates/interface/Jet.h" 
 #include "DataFormats/JetReco/interface/PFJet.h"

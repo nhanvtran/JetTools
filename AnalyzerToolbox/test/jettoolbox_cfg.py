@@ -7,14 +7,74 @@ process.options.allowUnscheduled = cms.untracked.bool(True)
 process.load("PhysicsTools.PatAlgos.producersLayer1.patCandidates_cff")
 process.load("PhysicsTools.PatAlgos.selectionLayer1.selectedPatCandidates_cff")
 
-process.load('JetTools.AnalyzerToolbox.AnalyzerJetToolbox_cff')
-process.Njettiness.src = cms.InputTag("ak5PFJetsCHS")
-process.Njettiness.cone = cms.double(0.5)
+####################################################################################################
+#THE JET TOOLBOX
 
-process.patJets.userData.userFloats.src = ['Njettiness:tau1','Njettiness:tau2','Njettiness:tau3']
+#configure the jet toolbox
+inputCollection = cms.InputTag("ak5PFJetsCHS")
 
-process.out.outputCommands+=["keep *_*Njettiness*_*_*",
-                             "keep *_*ak5PFJets*_*_*"]
+#---------------------------------------------------------------------------------------------------
+#load the various tools
+
+#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+#Njettiness
+process.load('JetTools.AnalyzerToolbox.njettinessadder_cfi')
+process.Njettiness.src = inputCollection
+
+#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+#pileupJetID
+
+#from JetTools.AnalyzerToolbox.puJetIDAlgo_cff import *
+process.load("JetTools.AnalyzerToolbox.pileupjetidproducer_cfi")
+process.pileupJetIdCalculator.jets = inputCollection
+process.pileupJetIdEvaluator.jets = inputCollection
+
+"""
+process.pileupJetIdCalculator = cms.EDProducer('PileupJetIdProducer',
+                                                produceJetIds = cms.bool(True),
+                                                jetids = cms.InputTag(""),
+                                                runMvas = cms.bool(False),
+                                                jets = inputCollection,
+                                                vertexes = cms.InputTag("offlinePrimaryVertices"),
+                                                algos = cms.VPSet(cms.VPSet(cutbased)),
+                                                
+                                                rho     = cms.InputTag("kt6PFJets","rho"),
+                                                jec     = cms.string("AK5PFchs"),
+                                                applyJec = cms.bool(False),
+                                                inputIsCorrected = cms.bool(True),
+                                                residualsFromTxt = cms.bool(False),
+                                                residualsTxt     = cms.FileInPath("JetTools/AnalyzerToolbox/data/pileupJetId/dummy.txt"),
+                                                )
+
+process.pileupJetIdEvaluator = cms.EDProducer('PileupJetIdProducer',
+                                              produceJetIds = cms.bool(False),
+                                              jetids = cms.InputTag("pileupJetIdCalculator"),
+                                              runMvas = cms.bool(True),
+                                              jets = inputCollection,
+                                              vertexes = cms.InputTag("offlinePrimaryVertices"),
+                                              algos = cms.VPSet(cms.VPSet(cutbased,full_53x_chs)),
+                                              
+                                              rho     = cms.InputTag("kt6PFJets","rho"),
+                                              jec     = cms.string("AK5PFchs"),
+                                              applyJec = cms.bool(False),
+                                              inputIsCorrected = cms.bool(True),
+                                              residualsFromTxt = cms.bool(False),
+                                              residualsTxt     = cms.FileInPath("JetTools/AnalyzerToolbox/data/pileupJetId/dummy.txt"),
+                                              )
+"""
+#---------------------------------------------------------------------------------------------------
+#use PAT to turn ValueMaps into userFloats
+
+process.patJets.userData.userFloats.src = ['Njettiness:tau1','Njettiness:tau2','Njettiness:tau3',
+                                           'pileupJetIdEvaluator:cutbasedDiscriminant','pileupJetIdEvaluator:fullDiscriminant']
+
+process.patJets.userData.userInts.src = ['pileupJetIdEvaluator:cutbasedId','pileupJetIdEvaluator:fullId']
+
+process.out.outputCommands+=["keep *_*ak5PFJets*_*_*",
+                             "keep *_Njettiness_*_*",
+                             "keep *_pileupJetId*_*_*"]
+
+####################################################################################################
 
 ## ------------------------------------------------------
 #  In addition you usually want to change the following
@@ -26,7 +86,7 @@ process.out.outputCommands+=["keep *_*Njettiness*_*_*",
 from PhysicsTools.PatAlgos.patInputFiles_cff import filesRelValProdTTbarAODSIM
 process.source.fileNames = filesRelValProdTTbarAODSIM
 #                                         ##
-process.maxEvents.input = 10
+process.maxEvents.input = 500
 #                                         ##
 #   process.out.outputCommands = [ ... ]  ##  (e.g. taken from PhysicsTools/PatAlgos/python/patEventContent_cff.py)
 #                                         ##
