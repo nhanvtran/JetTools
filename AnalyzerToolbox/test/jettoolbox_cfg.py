@@ -29,39 +29,6 @@ process.load("JetTools.AnalyzerToolbox.pileupjetidproducer_cfi")
 process.pileupJetIdCalculator.jets = inputCollection
 process.pileupJetIdEvaluator.jets = inputCollection
 
-"""
-process.pileupJetIdCalculator = cms.EDProducer('PileupJetIdProducer',
-                                                produceJetIds = cms.bool(True),
-                                                jetids = cms.InputTag(""),
-                                                runMvas = cms.bool(False),
-                                                jets = inputCollection,
-                                                vertexes = cms.InputTag("offlinePrimaryVertices"),
-                                                algos = cms.VPSet(cms.VPSet(cutbased)),
-                                                
-                                                rho     = cms.InputTag("kt6PFJets","rho"),
-                                                jec     = cms.string("AK5PFchs"),
-                                                applyJec = cms.bool(False),
-                                                inputIsCorrected = cms.bool(True),
-                                                residualsFromTxt = cms.bool(False),
-                                                residualsTxt     = cms.FileInPath("JetTools/AnalyzerToolbox/data/pileupJetId/dummy.txt"),
-                                                )
-
-process.pileupJetIdEvaluator = cms.EDProducer('PileupJetIdProducer',
-                                              produceJetIds = cms.bool(False),
-                                              jetids = cms.InputTag("pileupJetIdCalculator"),
-                                              runMvas = cms.bool(True),
-                                              jets = inputCollection,
-                                              vertexes = cms.InputTag("offlinePrimaryVertices"),
-                                              algos = cms.VPSet(cms.VPSet(cutbased,full_53x_chs)),
-                                              
-                                              rho     = cms.InputTag("kt6PFJets","rho"),
-                                              jec     = cms.string("AK5PFchs"),
-                                              applyJec = cms.bool(False),
-                                              inputIsCorrected = cms.bool(True),
-                                              residualsFromTxt = cms.bool(False),
-                                              residualsTxt     = cms.FileInPath("JetTools/AnalyzerToolbox/data/pileupJetId/dummy.txt"),
-                                              )
-"""
 #---------------------------------------------------------------------------------------------------
 #use PAT to turn ValueMaps into userFloats
 
