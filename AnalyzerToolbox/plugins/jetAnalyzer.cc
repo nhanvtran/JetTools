@@ -70,6 +70,10 @@ private:
 
   TH1F* h_cutbasedId = new TH1F("cutbasedId",";cutbasedId",8,-0.5,7.5);
   TH1F* h_fullId = new TH1F("fullId",";fullId",8,-0.5,7.5);
+
+  TH1F* h_qgMLP = new TH1F("qgMLP",";qgMLP",25,0,1);
+  TH1F* h_qgLikelihood= new TH1F("qgLikelihood",";qgLikelihood",25,0,1);
+
 };
 
 //
@@ -116,6 +120,9 @@ jetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   for( edm::View<pat::Jet>::const_iterator jet_iter = jets->begin();
        jet_iter !=jets->end(); ++jet_iter)
     {
+      float pt = jet_iter->pt();
+      float eta = jet_iter->eta();
+
       float tau1 = jet_iter->userFloat("Njettiness:tau1");
       float tau2 = jet_iter->userFloat("Njettiness:tau2");
       float tau3 = jet_iter->userFloat("Njettiness:tau3");
@@ -125,6 +132,9 @@ jetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
        
       float fullDiscriminant = jet_iter->userFloat("pileupJetIdEvaluator:fullDiscriminant");
       int fullId = jet_iter->userInt("pileupJetIdEvaluator:fullId");
+
+      float qgLikelihood = jet_iter->userFloat("QGTagger:qgLikelihood");
+      float qgMLP = jet_iter->userFloat("QGTagger:qgMLP");
 
       h_tau1->Fill(tau1);
       h_tau2->Fill(tau2);
@@ -136,16 +146,25 @@ jetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       h_cutbasedId->Fill(cutbasedId);
       h_fullId->Fill(fullId);
       
-      std::cout<<"tau1:"<<tau1<<std::endl;
-      std::cout<<"tau2:"<<tau2<<std::endl;
-      std::cout<<"tau3:"<<tau3<<std::endl;
+      h_qgLikelihood->Fill(qgLikelihood);
+      h_qgMLP->Fill(qgMLP);
 
-      std::cout<<"cutbasedDiscriminant:"<<cutbasedDiscriminant<<std::endl;
-      std::cout<<"cutbasedId:"<<cutbasedId<<std::endl;
+      std::cout<<"pt: "<<pt<<std::endl;
+      std::cout<<"eta: "<<eta<<std::endl;
 
-      std::cout<<"fullDiscriminant:"<<fullDiscriminant<<std::endl;
-      std::cout<<"fullId:"<<fullId<<std::endl;
+      std::cout<<"tau1: "<<tau1<<std::endl;
+      std::cout<<"tau2: "<<tau2<<std::endl;
+      std::cout<<"tau3: "<<tau3<<std::endl;
 
+      std::cout<<"cutbasedDiscriminant: "<<cutbasedDiscriminant<<std::endl;
+      std::cout<<"cutbasedId: "<<cutbasedId<<std::endl;
+
+      std::cout<<"fullDiscriminant: "<<fullDiscriminant<<std::endl;
+      std::cout<<"fullId: "<<fullId<<std::endl;
+
+      std::cout<<"qgLikelihood: "<<qgLikelihood<<std::endl;
+      std::cout<<"qgMLP: "<<qgMLP<<std::endl;
+      
       std::cout<<std::endl;
     }
   /*
@@ -183,6 +202,9 @@ jetAnalyzer::endJob()
 
   h_cutbasedId->Write();
   h_fullId->Write();
+
+  h_qgLikelihood->Write();
+  h_qgMLP->Write();
 
   f->Close();
 }

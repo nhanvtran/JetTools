@@ -18,28 +18,38 @@ inputCollection = cms.InputTag("ak5PFJetsCHS")
 
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 #Njettiness
+
 process.load('JetTools.AnalyzerToolbox.njettinessadder_cfi')
 process.Njettiness.src = inputCollection
 
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 #pileupJetID
 
-#from JetTools.AnalyzerToolbox.puJetIDAlgo_cff import *
 process.load("JetTools.AnalyzerToolbox.pileupjetidproducer_cfi")
 process.pileupJetIdCalculator.jets = inputCollection
 process.pileupJetIdEvaluator.jets = inputCollection
+
+#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+#QGTagger
+
+process.load('JetTools.AnalyzerToolbox.QGTagger_RecoJets_cff')
+process.QGTagger.srcJets = inputCollection
+process.QGTagger.useCHS  = cms.untracked.bool(True)
+process.QGTagger.jec     = cms.untracked.string('ak5PFL1FastL2L3')
 
 #---------------------------------------------------------------------------------------------------
 #use PAT to turn ValueMaps into userFloats
 
 process.patJets.userData.userFloats.src = ['Njettiness:tau1','Njettiness:tau2','Njettiness:tau3',
-                                           'pileupJetIdEvaluator:cutbasedDiscriminant','pileupJetIdEvaluator:fullDiscriminant']
+                                           'pileupJetIdEvaluator:cutbasedDiscriminant','pileupJetIdEvaluator:fullDiscriminant',
+                                           'QGTagger:qgLikelihood','QGTagger:qgMLP']
 
 process.patJets.userData.userInts.src = ['pileupJetIdEvaluator:cutbasedId','pileupJetIdEvaluator:fullId']
 
-process.out.outputCommands+=["keep *_*ak5PFJets*_*_*",
+process.out.outputCommands+=["keep *_ak5PFJetsCHS_*_*",
                              "keep *_Njettiness_*_*",
-                             "keep *_pileupJetId*_*_*"]
+                             "keep *_pileupJetId*_*_*",
+                             "keep *_QGTagger_*_*"]
 
 ####################################################################################################
 

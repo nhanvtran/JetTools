@@ -1,4 +1,4 @@
-#include "../interface/PileupJetIdentifier.h"
+#include "JetTools/AnalyzerToolbox/interface/PileupJetIdentifier.h"
 
 #include <iostream>
 #include <sstream>
