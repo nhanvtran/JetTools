@@ -37,19 +37,37 @@ process.QGTagger.srcJets = inputCollection
 process.QGTagger.useCHS  = cms.untracked.bool(True)
 process.QGTagger.jec     = cms.untracked.string('ak5PFL1FastL2L3')
 
+#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+process.QJetsAdder = cms.EDProducer("QjetsAdder",
+                                    src=inputCollection,
+                                    zcut=cms.double(0.1),
+                                    dcutfctr=cms.double(0.5),
+                                    expmin=cms.double(0.0),
+                                    expmax=cms.double(0.0),
+                                    rigidity=cms.double(0.1),
+                                    ntrial = cms.int32(50),
+                                    cutoff=cms.double(10.0),
+                                    jetRad= cms.double(0.5),
+                                    jetAlgo=cms.string("AK"),
+                                    preclustering = cms.int32(50),
+                                    )
+
 #---------------------------------------------------------------------------------------------------
 #use PAT to turn ValueMaps into userFloats
 
 process.patJets.userData.userFloats.src = ['Njettiness:tau1','Njettiness:tau2','Njettiness:tau3',
                                            'pileupJetIdEvaluator:cutbasedDiscriminant','pileupJetIdEvaluator:fullDiscriminant',
-                                           'QGTagger:qgLikelihood','QGTagger:qgMLP']
+                                           'QGTagger:qgLikelihood','QGTagger:qgMLP',
+                                           'QJetsAdder:QjetsVolatility']
 
 process.patJets.userData.userInts.src = ['pileupJetIdEvaluator:cutbasedId','pileupJetIdEvaluator:fullId']
 
 process.out.outputCommands+=["keep *_ak5PFJetsCHS_*_*",
                              "keep *_Njettiness_*_*",
                              "keep *_pileupJetId*_*_*",
-                             "keep *_QGTagger_*_*"]
+                             "keep *_QGTagger_*_*",
+                             "keep *_QJetsAdder_*_*"]
 
 ####################################################################################################
 
