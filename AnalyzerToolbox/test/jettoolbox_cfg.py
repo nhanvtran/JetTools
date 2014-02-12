@@ -19,7 +19,7 @@ inputCollection = cms.InputTag("ak5PFJetsCHS")
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 #Njettiness
 
-process.load('JetTools.AnalyzerToolbox.njettinessadder_cfi')
+process.load('RecoJets/JetProducers.njettinessadder_cfi')
 process.Njettiness.src = inputCollection
 
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -39,19 +39,8 @@ process.QGTagger.jec     = cms.untracked.string('ak5PFL1FastL2L3')
 
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-process.QJetsAdder = cms.EDProducer("QjetsAdder",
-                                    src=inputCollection,
-                                    zcut=cms.double(0.1),
-                                    dcutfctr=cms.double(0.5),
-                                    expmin=cms.double(0.0),
-                                    expmax=cms.double(0.0),
-                                    rigidity=cms.double(0.1),
-                                    ntrial = cms.int32(50),
-                                    cutoff=cms.double(10.0),
-                                    jetRad= cms.double(0.5),
-                                    jetAlgo=cms.string("AK"),
-                                    preclustering = cms.int32(50),
-                                    )
+process.load('RecoJets/JetProducers.qjetsadder_cfi')
+process.QJetsAdder.src = inputCollection
 
 #---------------------------------------------------------------------------------------------------
 #use PAT to turn ValueMaps into userFloats
