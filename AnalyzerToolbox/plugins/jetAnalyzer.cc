@@ -75,6 +75,8 @@ private:
   TH1F* h_qgLikelihood = new TH1F("qgLikelihood",";qgLikelihood",25,0,1);
 
   TH1F* h_QjetsVolatility = new TH1F("QjetsVolatility",";QjetsVolatility",25,-1,2);
+
+  TH1F* h_prunedMass = new TH1F("prunedMass",";pruned mass",50,0,500);
 };
 
 //
@@ -139,6 +141,8 @@ jetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
       float QjetsVolatility = jet_iter->userFloat("QJetsAdder:QjetsVolatility");
 
+      float prunedMass = jet_iter->userFloat("prunedMass");
+
       h_tau1->Fill(tau1);
       h_tau2->Fill(tau2);
       h_tau3->Fill(tau3);
@@ -153,6 +157,8 @@ jetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       h_qgMLP->Fill(qgMLP);
 
       h_QjetsVolatility->Fill(QjetsVolatility);
+
+      h_prunedMass->Fill(prunedMass);
 
       std::cout<<"pt: "<<pt<<std::endl;
       std::cout<<"eta: "<<eta<<std::endl;
@@ -171,6 +177,8 @@ jetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       std::cout<<"qgMLP: "<<qgMLP<<std::endl;
 
       std::cout<<"QjetsVolatility: "<<QjetsVolatility<<std::endl;
+
+      std::cout<<"prunedMAss: "<<prunedMass<<std::endl;
 
       std::cout<<std::endl;
     }
@@ -214,6 +222,8 @@ jetAnalyzer::endJob()
   h_qgMLP->Write();
 
   h_QjetsVolatility->Write();
+
+  h_prunedMass->Write();
 
   f->Close();
 }

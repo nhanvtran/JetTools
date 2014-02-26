@@ -7,12 +7,60 @@ process.options.allowUnscheduled = cms.untracked.bool(True)
 process.load('PhysicsTools.PatAlgos.producersLayer1.patCandidates_cff')
 process.load('PhysicsTools.PatAlgos.selectionLayer1.selectedPatCandidates_cff')
 
+process.load("RecoJets.Configuration.RecoGenJets_cff")
+process.load("RecoJets.Configuration.GenJetParticles_cff")
+
+process.ca8GenJetsNoNu = process.ca6GenJetsNoNu.clone( rParam = 0.8 )
+
+## uncomment the following line to add different jet collections
+## to the event content
+from PhysicsTools.PatAlgos.tools.jetTools import addJetCollection
+from PhysicsTools.PatAlgos.tools.jetTools import switchJetCollection
+
+
+addJetCollection(
+       process,
+          labelName = 'CA8PFCHS',
+          jetSource = cms.InputTag('ca8PFJetsCHS'),
+          algo='ca8',
+          jetCorrections = ('AK7PFchs', cms.vstring(['L1FastJet', 'L2Relative', 'L3Absolute']), 'None')
+          )
+
+switchJetCollection(
+       process,
+          jetSource = cms.InputTag('ak5PFJets'),
+          jetCorrections = ('AK5PF', cms.vstring(['L1FastJet', 'L2Relative', 'L3Absolute']), 'Type-1'),
+          btagDiscriminators = [
+           'jetBProbabilityBJetTags'
+                , 'jetProbabilityBJetTags'
+                , 'trackCountingHighPurBJetTags'
+                , 'trackCountingHighEffBJetTags'
+                , 'simpleSecondaryVertexHighEffBJetTags'
+                , 'simpleSecondaryVertexHighPurBJetTags'
+                , 'combinedSecondaryVertexBJetTags'
+                ],
+          )
+
+from JetMETAnalyses.TestValueMap.makeTooledJets_cfi import tooledJets
+process.ca8PFJetsCHSTooled = tooledJets.clone()
+process.ca8PFJetsCHSTooled.src = 'selectedPatJetsCA8PFCHS'
+process.ca8PFJetsCHSTooled.doubleValueMaps = cms.VInputTag( ["ca8PFJetsCHSPrunedLinks" ] )
+process.ca8PFJetsCHSTooled.doubleValueMapIDStrings = cms.vstring( ['prunedMass'] )
+
+"""
+process.patJets.userData.userFloats.src = ['Njettiness:tau1','Njettiness:tau2','Njettiness:tau3',
+'pileupJetIdEvaluator:cutbasedDiscriminant','pileupJetIdEvaluator:fullDiscriminant',
+'QGTagger:qgLikelihood','QGTagger:qgMLP',
+'QJetsAdder:QjetsVolatility']
+
+process.patJets.userData.userInts.src = ['pileupJetIdEvaluator:cutbasedId','pileupJetIdEvaluator:fullId']  
+"""    
 ####################################################################################################
 #THE JET TOOLBOX
 
 #configure the jet toolbox
-inputCollection = cms.InputTag('ak5PFJetsCHS')
-#inputCollection = cms.InputTag("ca8PFJetsCHS")
+#inputCollection = cms.InputTag('ak5PFJetsCHS')
+inputCollection = cms.InputTag("ca8PFJetsCHS")
 
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -65,7 +113,7 @@ process.QJetsAdder.jetRad = cms.double(distPar)
 
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 #Grooming valueMaps
-
+"""
 process.load("RecoJets.Configuration.RecoPFJets_cff")
 
 ca8PrunedSequence=cms.Sequence(
@@ -73,10 +121,10 @@ ca8PrunedSequence=cms.Sequence(
     process.ca8PFJetsCHSPruned+
     process.ca8PFJetsCHSPrunedLinks
     )
-
-#process.load('RecoJets.JetProducers.ak8PFJetsCHS_groomingValueMaps_cfi')
-#process.ca8PFJetsCHSPrunedLinks.src = inputCollection
-#process.ca8PFJetsCHSPrunedLinks.matched = cms.InputTag(inputCollection.value()+"Pruned")
+"""
+process.load('RecoJets.JetProducers.ca8PFJetsCHS_groomingValueMaps_cfi')
+process.ca8PFJetsCHSPrunedLinks.src = inputCollection
+process.ca8PFJetsCHSPrunedLinks.matched = cms.InputTag(inputCollection.value()+"Pruned")
 
 #process.ca8PFJetsCHSTrimmedLinks.src = inputCollection
 #process.ca8PFJetsCHSTrimmedLinks.matched = cms.InputTag(inputCollection.value()+"Trimmed")
@@ -86,20 +134,23 @@ ca8PrunedSequence=cms.Sequence(
 
 #---------------------------------------------------------------------------------------------------
 #use PAT to turn ValueMaps into userFloats
-
+"""
 process.patJets.userData.userFloats.src = ['Njettiness:tau1','Njettiness:tau2','Njettiness:tau3',
                                            'pileupJetIdEvaluator:cutbasedDiscriminant','pileupJetIdEvaluator:fullDiscriminant',
                                            'QGTagger:qgLikelihood','QGTagger:qgMLP',
                                            'QJetsAdder:QjetsVolatility']
 
 process.patJets.userData.userInts.src = ['pileupJetIdEvaluator:cutbasedId','pileupJetIdEvaluator:fullId']
-
+"""
 process.out.outputCommands+=['keep *_ak5PFJetsCHS_*_*',
                              'keep *_Njettiness_*_*',
                              'keep *_pileupJetId*_*_*',
                              'keep *_QGTagger_*_*',
                              'keep *_QJetsAdder_*_*',
-                             'keep *_ca8PFJetsCHSPrunedLinks_*_*']
+                             'keep *_ca8PFJetsCHS_*_*',
+                             'keep *_ca8PFJetsCHSTooled_*_*',
+                             'keep *_ca8PFJetsCHSPrunedLinks_*_*',
+                             ]
 
 ####################################################################################################
 
@@ -113,7 +164,7 @@ process.out.outputCommands+=['keep *_ak5PFJetsCHS_*_*',
 from PhysicsTools.PatAlgos.patInputFiles_cff import filesRelValProdTTbarAODSIM
 process.source.fileNames = filesRelValProdTTbarAODSIM
 #                                         ##
-process.maxEvents.input = 500
+process.maxEvents.input = 5
 #                                         ##
 #   process.out.outputCommands = [ ... ]  ##  (e.g. taken from PhysicsTools/PatAlgos/python/patEventContent_cff.py)
 #                                         ##
