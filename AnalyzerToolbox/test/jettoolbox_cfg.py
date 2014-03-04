@@ -7,6 +7,10 @@ process.options.allowUnscheduled = cms.untracked.bool(True)
 process.load("PhysicsTools.PatAlgos.producersLayer1.patCandidates_cff")
 process.load("PhysicsTools.PatAlgos.selectionLayer1.selectedPatCandidates_cff")
 
+#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+process.RandomNumberGeneratorService = cms.Service("RandomNumberGeneratorService",QJetsAdder = cms.PSet(initialSeed = cms.untracked.uint32(7)))
+
 ####################################################################################################
 #THE JET TOOLBOX
 
@@ -19,7 +23,7 @@ inputCollection = cms.InputTag("ak5PFJetsCHS")
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 #Njettiness
 
-process.load('RecoJets/JetProducers.njettinessadder_cfi')
+process.load('RecoJets/JetProducers.nJettinessAdder_cfi')
 process.Njettiness.src = inputCollection
 
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
