@@ -11,8 +11,6 @@ process.load("RecoJets.Configuration.GenJetParticles_cff")
 
 process.ca8GenJetsNoNu = process.ca6GenJetsNoNu.clone( rParam = 0.8 )
 
-## uncomment the following line to add different jet collections
-## to the event content
 from PhysicsTools.PatAlgos.tools.jetTools import addJetCollection
 from PhysicsTools.PatAlgos.tools.jetTools import switchJetCollection
 
@@ -21,6 +19,14 @@ addJetCollection(
     labelName = 'CA8PFCHS',
     jetSource = cms.InputTag('ca8PFJetsCHS'),
     algo='ca8',
+    jetCorrections = ('AK7PFchs', cms.vstring(['L1FastJet', 'L2Relative', 'L3Absolute']), 'None')
+    )
+
+addJetCollection(
+    process,
+    labelName = 'AK8PFCHS',
+    jetSource = cms.InputTag('ak8PFJetsCHS'),
+    algo='ak8',
     jetCorrections = ('AK7PFchs', cms.vstring(['L1FastJet', 'L2Relative', 'L3Absolute']), 'None')
     )
 
@@ -42,8 +48,9 @@ switchJetCollection(
 #THE JET TOOLBOX
 
 #configure the jet toolbox
-#inputCollection = cms.InputTag('ak5PFJetsCHS')
+
 inputCollection = cms.InputTag("ca8PFJetsCHS")
+#inputCollection = cms.InputTag('ak8PFJetsCHS')
 
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -68,8 +75,11 @@ except:
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 #Njettiness
 
-process.load('RecoJets.JetProducers.njettinessadder_cfi')
+process.RandomNumberGeneratorService = cms.Service("RandomNumberGeneratorService",QJetsAdder = cms.PSet(initialSeed = cms.untracked.uint32(7)))
+
+process.load('RecoJets.JetProducers.nJettinessAdder_cfi')
 process.Njettiness.src = inputCollection
+process.Njettiness.cone=cms.double(distPar)
 
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 #pileupJetID
@@ -81,25 +91,25 @@ process.pileupJetIdEvaluator.jets = inputCollection
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 #QGTagger
 
-process.load('RecoJets.JetProducers.QGTagger_RecoJets_cff')
+process.load('RecoJets.JetProducers.QGTagger_cfi')
 process.QGTagger.srcJets = inputCollection
-process.QGTagger.useCHS  = cms.untracked.bool(True)
-process.QGTagger.jec     = cms.untracked.string('ak5PFL1FastL2L3')
+process.QGTagger.useCHS  = cms.bool(True)
+process.QGTagger.jec     = cms.string('')
 
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 #QJetsAdder
 
 process.load('RecoJets.JetProducers.qjetsadder_cfi')
 process.QJetsAdder.src=inputCollection
-process.QJetsAdder.jetAlgo=cms.string(alg.upper())
 process.QJetsAdder.jetRad = cms.double(distPar)
+process.QJetsAdder.jetAlgo=cms.string(alg.upper())
 
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 #Grooming valueMaps
+process.load('RecoJets.Configuration.RecoPFJets_cff')
 
-process.load('RecoJets.JetProducers.ca8PFJetsCHS_groomingValueMaps_cfi')
-process.ca8PFJetsCHSPrunedLinks.src = inputCollection
-process.ca8PFJetsCHSPrunedLinks.matched = cms.InputTag(inputCollection.value()+"Pruned")
+#process.ca8PFJetsCHSPrunedLinks.src = inputCollection
+#process.ca8PFJetsCHSPrunedLinks.matched = cms.InputTag(inputCollection.value()+"Pruned")
 
 #process.ca8PFJetsCHSTrimmedLinks.src = inputCollection
 #process.ca8PFJetsCHSTrimmedLinks.matched = cms.InputTag(inputCollection.value()+"Trimmed")
@@ -110,39 +120,72 @@ process.ca8PFJetsCHSPrunedLinks.matched = cms.InputTag(inputCollection.value()+"
 #---------------------------------------------------------------------------------------------------
 #use PAT to turn ValueMaps into userFloats
 
-process.patJetsCA8PFCHS.userData.userFloats.src = ['Njettiness:tau1','Njettiness:tau2','Njettiness:tau3',
-                                                   'pileupJetIdEvaluator:cutbasedDiscriminant','pileupJetIdEvaluator:fullDiscriminant',
-                                                   'QGTagger:qgLikelihood','QGTagger:qgMLP',
-                                                   'QJetsAdder:QjetsVolatility',
-                                                   ]
+if inputCollection.value()=="ca8PFJetsCHS": patJets=process.patJetsCA8PFCHS
+elif inputCollection.value()=="ak8PFJetsCHS": patJets=process.patJetsAK8PFCHS
 
-process.patJetsCA8PFCHS.userData.userInts.src = ['pileupJetIdEvaluator:cutbasedId','pileupJetIdEvaluator:fullId']
+patJets.userData.userFloats.src = ['Njettiness:tau1','Njettiness:tau2','Njettiness:tau3',
+                                   'pileupJetIdEvaluator:fullDiscriminant',
+                                   'QGTagger:qgLikelihood',
+                                   'QJetsAdder:QjetsVolatility',
+                                   ]
 
+patJets.userData.userInts.src = ['pileupJetIdEvaluator:cutbasedId','pileupJetIdEvaluator:fullId']
+
+#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 from JetMETAnalyses.TestValueMap.makeTooledJets_cfi import tooledJets
-process.ca8PFJetsCHSTooled = tooledJets.clone()
-process.ca8PFJetsCHSTooled.src = 'selectedPatJetsCA8PFCHS'
-process.ca8PFJetsCHSTooled.doubleValueMaps = cms.VInputTag(["ca8PFJetsCHSPrunedLinks",
-                                                            #"ca8PFJetsCHSTrimmedLinks",
-                                                            #"ca8PFJetsCHSFilteredLinks"
-                                                            ]
-                                                           )
-process.ca8PFJetsCHSTooled.doubleValueMapIDStrings = cms.vstring(['prunedMass',
-                                                                  #'trimmedMass',
-                                                                  #'filteredMass'
-                                                                  ]
+
+if inputCollection.value()=="ca8PFJetsCHS":
+    process.ca8PFJetsCHSTooled = tooledJets.clone()
+    process.ca8PFJetsCHSTooled.src = 'selectedPatJetsCA8PFCHS'
+    process.ca8PFJetsCHSTooled.doubleValueMaps = cms.VInputTag(["ca8PFJetsCHSPrunedLinks",
+                                                                "ca8PFJetsCHSTrimmedLinks",
+                                                                "ca8PFJetsCHSFilteredLinks"
+                                                                ]
+                                                               )
+    process.ca8PFJetsCHSTooled.doubleValueMapIDStrings = cms.vstring(['prunedMass',
+                                                                      'trimmedMass',
+                                                                      'filteredMass'
+                                                                      ]
                                                                  )
 
-process.out.outputCommands+=['keep *_ak5PFJetsCHS_*_*',
-                             'keep *_Njettiness_*_*',
-                             'keep *_pileupJetId*_*_*',
-                             'keep *_QGTagger_*_*',
-                             'keep *_QJetsAdder_*_*',
-                             'keep *_ca8PFJetsCHS_*_*',
-                             'keep *_ca8PFJetsCHSTooled_*_*',
-                             'keep *_ca8PFJetsCHSPrunedLinks_*_*',
-                             #'keep *_ca8PFJetsCHSTrimmedLinks_*_*',
-                             #'keep *_ca8PFJetsCHSFilteredLinks_*_*',
-                             ]
+elif inputCollection.value()=="ak8PFJetsCHS":
+    process.ak8PFJetsCHSTooled = tooledJets.clone()
+    process.ak8PFJetsCHSTooled.src = 'selectedPatJetsAK8PFCHS'
+    process.ak8PFJetsCHSTooled.doubleValueMaps = cms.VInputTag(["ak8PFJetsCHSPrunedLinks",
+                                                                "ak8PFJetsCHSTrimmedLinks",
+                                                                "ak8PFJetsCHSFilteredLinks"
+                                                                ]
+                                                               )
+    process.ak8PFJetsCHSTooled.doubleValueMapIDStrings = cms.vstring(['prunedMass',
+                                                                      'trimmedMass',
+                                                                      'filteredMass'
+                                                                      ]
+                                                                     )
+
+#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
+
+#process.out.outputCommands+=['keep *_ak5PFJetsCHS_*_*',
+process.out.outputCommands=['drop *',
+                            'keep *_Njettiness_*_*',
+                            'keep *_pileupJetId*_*_*',
+                            'keep *_QGTagger_*_*',
+                            'keep *_QJetsAdder_*_*']
+
+if inputCollection.value()=="ca8PFJetsCHS":
+    process.out.outputCommands+=['keep *_ca8PFJetsCHS__PAT',
+                                 'keep *_ca8PFJetsCHSTooled__PAT',
+                                 'keep *_ca8PFJetsCHSPrunedLinks__PAT',
+                                 'keep *_ca8PFJetsCHSTrimmedLinks__PAT',
+                                 'keep *_ca8PFJetsCHSFilteredLinks__PAT',
+                                 ]
+    
+elif inputCollection.value()=="ak8PFJetsCHS":
+    process.out.outputCommands+=['keep *_ak8PFJetsCHS__PAT',
+                                 'keep *_ak8PFJetsCHSTooled__PAT',
+                                 'keep *_ak8PFJetsCHSPrunedLinks__PAT',
+                                 'keep *_ak8PFJetsCHSTrimmedLinks__PAT',
+                                 'keep *_ak8PFJetsCHSFilteredLinks__PAT',
+                                 ]
 
 ####################################################################################################
 
@@ -153,8 +196,9 @@ process.out.outputCommands+=['keep *_ak5PFJetsCHS_*_*',
 #
 #   process.GlobalTag.globaltag =  ...    ##  (according to https://twiki.cern.ch/twiki/bin/view/CMS/SWGuideFrontierConditions)
 #                                         ##
-from PhysicsTools.PatAlgos.patInputFiles_cff import filesRelValProdTTbarAODSIM
-process.source.fileNames = filesRelValProdTTbarAODSIM
+#from PhysicsTools.PatAlgos.patInputFiles_cff import filesRelValProdTTbarAODSIM
+#process.source.fileNames = filesRelValProdTTbarAODSIM
+process.source.fileNames = cms.untracked.vstring('/store/relval/CMSSW_7_0_0_pre11/RelValRSKKGluon_m3000GeV_13/GEN-SIM-RECO/POSTLS162_V4-v1/00000/1CCFFDA6-846A-E311-9E61-0025905964C2.root')
 #                                         ##
 process.maxEvents.input = 5
 #                                         ##

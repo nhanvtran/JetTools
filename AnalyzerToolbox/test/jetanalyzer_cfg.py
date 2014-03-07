@@ -15,6 +15,7 @@ process.source = cms.Source("PoolSource",
 
 process.demo = cms.EDAnalyzer('jetAnalyzer',
                               src=cms.InputTag("ca8PFJetsCHSTooled")
+                              #src=cms.InputTag("ak8PFJetsCHSTooled")
 )
 
 

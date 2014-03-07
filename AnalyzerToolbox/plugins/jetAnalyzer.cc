@@ -65,18 +65,19 @@ private:
   TH1F* h_tau2 = new TH1F("tau2",";#tau_{2}",25,0,1);
   TH1F* h_tau3 = new TH1F("tau3",";#tau_{3}",25,0,1);
 
-  TH1F* h_cutbasedDiscriminant = new TH1F("cutbasedDiscriminant",";cutbasedDiscriminant",25,0,1);
   TH1F* h_fullDiscriminant = new TH1F("fullDiscriminant",";fullDiscriminant",25,0,1);
 
   TH1F* h_cutbasedId = new TH1F("cutbasedId",";cutbasedId",8,-0.5,7.5);
   TH1F* h_fullId = new TH1F("fullId",";fullId",8,-0.5,7.5);
 
-  TH1F* h_qgMLP = new TH1F("qgMLP",";qgMLP",25,0,1);
   TH1F* h_qgLikelihood = new TH1F("qgLikelihood",";qgLikelihood",25,0,1);
 
   TH1F* h_QjetsVolatility = new TH1F("QjetsVolatility",";QjetsVolatility",25,-1,2);
 
   TH1F* h_prunedMass = new TH1F("prunedMass",";pruned mass",50,0,500);
+  TH1F* h_trimmedMass = new TH1F("trimmedMass",";trimmed mass",50,0,500);
+  TH1F* h_filteredMass = new TH1F("filteredMass",";filtered mass",50,0,500);
+
 };
 
 //
@@ -130,35 +131,35 @@ jetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       float tau2 = jet_iter->userFloat("Njettiness:tau2");
       float tau3 = jet_iter->userFloat("Njettiness:tau3");
 
-      float cutbasedDiscriminant = jet_iter->userFloat("pileupJetIdEvaluator:cutbasedDiscriminant");
       int cutbasedId = jet_iter->userInt("pileupJetIdEvaluator:cutbasedId");
        
       float fullDiscriminant = jet_iter->userFloat("pileupJetIdEvaluator:fullDiscriminant");
       int fullId = jet_iter->userInt("pileupJetIdEvaluator:fullId");
 
       float qgLikelihood = jet_iter->userFloat("QGTagger:qgLikelihood");
-      float qgMLP = jet_iter->userFloat("QGTagger:qgMLP");
 
       float QjetsVolatility = jet_iter->userFloat("QJetsAdder:QjetsVolatility");
 
       float prunedMass = jet_iter->userFloat("prunedMass");
+      float trimmedMass = jet_iter->userFloat("trimmedMass");
+      float filteredMass = jet_iter->userFloat("filteredMass");
 
       h_tau1->Fill(tau1);
       h_tau2->Fill(tau2);
       h_tau3->Fill(tau3);
 
-      h_cutbasedDiscriminant->Fill(cutbasedDiscriminant);
       h_fullDiscriminant->Fill(fullDiscriminant);
       
       h_cutbasedId->Fill(cutbasedId);
       h_fullId->Fill(fullId);
       
       h_qgLikelihood->Fill(qgLikelihood);
-      h_qgMLP->Fill(qgMLP);
 
       h_QjetsVolatility->Fill(QjetsVolatility);
 
       h_prunedMass->Fill(prunedMass);
+      h_trimmedMass->Fill(trimmedMass);
+      h_filteredMass->Fill(filteredMass);
 
       std::cout<<"pt: "<<pt<<std::endl;
       std::cout<<"eta: "<<eta<<std::endl;
@@ -167,18 +168,18 @@ jetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       std::cout<<"tau2: "<<tau2<<std::endl;
       std::cout<<"tau3: "<<tau3<<std::endl;
 
-      std::cout<<"cutbasedDiscriminant: "<<cutbasedDiscriminant<<std::endl;
       std::cout<<"cutbasedId: "<<cutbasedId<<std::endl;
 
       std::cout<<"fullDiscriminant: "<<fullDiscriminant<<std::endl;
       std::cout<<"fullId: "<<fullId<<std::endl;
 
       std::cout<<"qgLikelihood: "<<qgLikelihood<<std::endl;
-      std::cout<<"qgMLP: "<<qgMLP<<std::endl;
 
       std::cout<<"QjetsVolatility: "<<QjetsVolatility<<std::endl;
 
-      std::cout<<"prunedMAss: "<<prunedMass<<std::endl;
+      std::cout<<"prunedMass: "<<prunedMass<<std::endl;
+      std::cout<<"trimmedMass: "<<trimmedMass<<std::endl;
+      std::cout<<"filteredMass: "<<filteredMass<<std::endl;
 
       std::cout<<std::endl;
     }
@@ -212,18 +213,18 @@ jetAnalyzer::endJob()
   h_tau2->Write();
   h_tau3->Write();
 
-  h_cutbasedDiscriminant->Write();
   h_fullDiscriminant->Write();
 
   h_cutbasedId->Write();
   h_fullId->Write();
 
   h_qgLikelihood->Write();
-  h_qgMLP->Write();
 
   h_QjetsVolatility->Write();
 
   h_prunedMass->Write();
+  h_trimmedMass->Write();
+  h_filteredMass->Write();
 
   f->Close();
 }
