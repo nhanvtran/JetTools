@@ -131,62 +131,38 @@ patJets.userData.userFloats.src = ['Njettiness:tau1','Njettiness:tau2','Njettine
 
 patJets.userData.userInts.src = ['pileupJetIdEvaluator:cutbasedId','pileupJetIdEvaluator:fullId']
 
+if alg=='ca': patJets.userData.userFloats.src = ['ca8PFJetsCHSPrunedLinks:mass',
+                                                 'ca8PFJetsCHSTrimmedLinks:mass',
+                                                 'ca8PFJetsCHSFilteredLinks:mass',
+                                                 ]
+
+elif alg=='ak': patJets.userData.userFloats.src = ['ak8PFJetsCHSPrunedLinks:mass',
+                                                   'ak8PFJetsCHSTrimmedLinks:mass',
+                                                   'ak8PFJetsCHSFilteredLinks:mass',
+                                                   ]
+
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-from JetMETAnalyses.TestValueMap.makeTooledJets_cfi import tooledJets
 
-if inputCollection.value()=="ca8PFJetsCHS":
-    process.ca8PFJetsCHSTooled = tooledJets.clone()
-    process.ca8PFJetsCHSTooled.src = 'selectedPatJetsCA8PFCHS'
-    process.ca8PFJetsCHSTooled.doubleValueMaps = cms.VInputTag(["ca8PFJetsCHSPrunedLinks",
-                                                                "ca8PFJetsCHSTrimmedLinks",
-                                                                "ca8PFJetsCHSFilteredLinks"
-                                                                ]
-                                                               )
-    process.ca8PFJetsCHSTooled.doubleValueMapIDStrings = cms.vstring(['prunedMass',
-                                                                      'trimmedMass',
-                                                                      'filteredMass'
-                                                                      ]
-                                                                 )
-
-elif inputCollection.value()=="ak8PFJetsCHS":
-    process.ak8PFJetsCHSTooled = tooledJets.clone()
-    process.ak8PFJetsCHSTooled.src = 'selectedPatJetsAK8PFCHS'
-    process.ak8PFJetsCHSTooled.doubleValueMaps = cms.VInputTag(["ak8PFJetsCHSPrunedLinks",
-                                                                "ak8PFJetsCHSTrimmedLinks",
-                                                                "ak8PFJetsCHSFilteredLinks"
-                                                                ]
-                                                               )
-    process.ak8PFJetsCHSTooled.doubleValueMapIDStrings = cms.vstring(['prunedMass',
-                                                                      'trimmedMass',
-                                                                      'filteredMass'
-                                                                      ]
-                                                                     )
-
-#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -    
-
-#process.out.outputCommands+=['keep *_ak5PFJetsCHS_*_*',
 process.out.outputCommands=['drop *',
                             'keep *_Njettiness_*_*',
                             'keep *_pileupJetId*_*_*',
                             'keep *_QGTagger_*_*',
-                            'keep *_QJetsAdder_*_*']
+                            'keep *_QJetsAdder_*_*',]
 
 if inputCollection.value()=="ca8PFJetsCHS":
-    process.out.outputCommands+=['keep *_ca8PFJetsCHS__PAT',
-                                 'keep *_ca8PFJetsCHSTooled__PAT',
-                                 'keep *_ca8PFJetsCHSPrunedLinks__PAT',
-                                 'keep *_ca8PFJetsCHSTrimmedLinks__PAT',
-                                 'keep *_ca8PFJetsCHSFilteredLinks__PAT',
-                                 ]
-    
-elif inputCollection.value()=="ak8PFJetsCHS":
-    process.out.outputCommands+=['keep *_ak8PFJetsCHS__PAT',
-                                 'keep *_ak8PFJetsCHSTooled__PAT',
-                                 'keep *_ak8PFJetsCHSPrunedLinks__PAT',
-                                 'keep *_ak8PFJetsCHSTrimmedLinks__PAT',
-                                 'keep *_ak8PFJetsCHSFilteredLinks__PAT',
+    process.out.outputCommands+=['keep *_patJetsCA8PFCHS_*_*',
+                                 'keep *_ca8PFJetsCHSPrunedLinks_*_*',
+                                 'keep *_ca8PFJetsCHSTrimmedLinks_*_*',
+                                 'keep *_ca8PFJetsCHSFilteredLinks_*_*',
                                  ]
 
+elif inputCollection.value()=="ak8PFJetsCHS":
+    process.out.outputCommands+=['keep *_patJetsAK8PFCHS_*_*',
+                                 'keep *_ak8PFJetsCHSPrunedLinks_*_*',
+                                 'keep *_ak8PFJetsCHSTrimmedLinks_*_*',
+                                 'keep *_ak8PFJetsCHSFilteredLinks_*_*',
+                                 ]
+    
 ####################################################################################################
 
 ## ------------------------------------------------------
