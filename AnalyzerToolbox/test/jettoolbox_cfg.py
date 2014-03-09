@@ -75,8 +75,6 @@ except:
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 #Njettiness
 
-process.RandomNumberGeneratorService = cms.Service("RandomNumberGeneratorService",QJetsAdder = cms.PSet(initialSeed = cms.untracked.uint32(7)))
-
 process.load('RecoJets.JetProducers.nJettinessAdder_cfi')
 process.Njettiness.src = inputCollection
 process.Njettiness.cone=cms.double(distPar)
@@ -101,6 +99,8 @@ process.QGTagger.jec     = cms.string('')
 
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 #QJetsAdder
+
+process.RandomNumberGeneratorService = cms.Service("RandomNumberGeneratorService",QJetsAdder = cms.PSet(initialSeed = cms.untracked.uint32(7)))
 
 process.load('RecoJets.JetProducers.qjetsadder_cfi')
 process.QJetsAdder.src=inputCollection
@@ -134,12 +134,12 @@ patJets.userData.userFloats.src = ['Njettiness:tau1','Njettiness:tau2','Njettine
 
 patJets.userData.userInts.src = ['pileupJetIdEvaluator:cutbasedId','pileupJetIdEvaluator:fullId']
 
-if alg=='ca': patJets.userData.userFloats.src = ['ca8PFJetsCHSPrunedLinks:mass',
+if alg=='ca': patJets.userData.userFloats.src += ['ca8PFJetsCHSPrunedLinks:mass',
                                                  'ca8PFJetsCHSTrimmedLinks:mass',
                                                  'ca8PFJetsCHSFilteredLinks:mass',
                                                  ]
 
-elif alg=='ak': patJets.userData.userFloats.src = ['ak8PFJetsCHSPrunedLinks:mass',
+elif alg=='ak': patJets.userData.userFloats.src += ['ak8PFJetsCHSPrunedLinks:mass',
                                                    'ak8PFJetsCHSTrimmedLinks:mass',
                                                    'ak8PFJetsCHSFilteredLinks:mass',
                                                    ]
@@ -179,7 +179,7 @@ elif inputCollection.value()=="ak8PFJetsCHS":
 #process.source.fileNames = filesRelValProdTTbarAODSIM
 process.source.fileNames = cms.untracked.vstring('/store/relval/CMSSW_7_0_0_pre11/RelValRSKKGluon_m3000GeV_13/GEN-SIM-RECO/POSTLS162_V4-v1/00000/1CCFFDA6-846A-E311-9E61-0025905964C2.root')
 #                                         ##
-process.maxEvents.input = 5
+process.maxEvents.input = 500
 #                                         ##
 #   process.out.outputCommands = [ ... ]  ##  (e.g. taken from PhysicsTools/PatAlgos/python/patEventContent_cff.py)
 #                                         ##
