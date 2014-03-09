@@ -84,6 +84,9 @@ process.Njettiness.cone=cms.double(distPar)
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 #pileupJetID
 
+import os
+open(os.environ['CMSSW_BASE']+'/src/RecoJets/JetProducers/data/dummy.txt', 'a').close()
+
 process.load('RecoJets.JetProducers.pileupjetidproducer_cfi')
 process.pileupJetIdCalculator.jets = inputCollection
 process.pileupJetIdEvaluator.jets = inputCollection
