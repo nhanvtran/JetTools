@@ -140,9 +140,9 @@ jetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
       float QjetsVolatility = jet_iter->userFloat("QJetsAdder:QjetsVolatility");
 
-      float prunedMass = jet_iter->userFloat("ca8PFJetsCHSPrunedLinks:mass");
-      float trimmedMass = jet_iter->userFloat("ca8PFJetsCHSTrimmedLinks:mass");
-      float filteredMass = jet_iter->userFloat("ca8PFJetsCHSFilteredLinks:mass");
+      float prunedMass = jet_iter->userFloat("ca8PFJetsCHSPrunedLinks");
+      float trimmedMass = jet_iter->userFloat("ca8PFJetsCHSTrimmedLinks");
+      float filteredMass = jet_iter->userFloat("ca8PFJetsCHSFilteredLinks");
 
       h_tau1->Fill(tau1);
       h_tau2->Fill(tau2);
