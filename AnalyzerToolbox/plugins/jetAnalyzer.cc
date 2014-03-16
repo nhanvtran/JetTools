@@ -72,11 +72,13 @@ private:
 
   TH1F* h_qgLikelihood = new TH1F("qgLikelihood",";qgLikelihood",25,0,1);
 
-  TH1F* h_QjetsVolatility = new TH1F("QjetsVolatility",";QjetsVolatility",25,-1,2);
+  TH1F* h_QjetsVolatility = new TH1F("QjetsVolatility",";QjetsVolatility",25,0,2);
 
   TH1F* h_prunedMass = new TH1F("prunedMass",";pruned mass",50,0,500);
   TH1F* h_trimmedMass = new TH1F("trimmedMass",";trimmed mass",50,0,500);
   TH1F* h_filteredMass = new TH1F("filteredMass",";filtered mass",50,0,500);
+
+  TH1F* h_topJetMass = new TH1F("topJetMass",";top jet mass",50,0,500);
 
 };
 
@@ -144,6 +146,8 @@ jetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       float trimmedMass = jet_iter->userFloat("ca8PFJetsCHSTrimmedLinks");
       float filteredMass = jet_iter->userFloat("ca8PFJetsCHSFilteredLinks");
 
+      float topJetMass = jet_iter->userFloat("hepTopTagPFJetsCHSLinks");
+
       h_tau1->Fill(tau1);
       h_tau2->Fill(tau2);
       h_tau3->Fill(tau3);
@@ -160,6 +164,8 @@ jetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       h_prunedMass->Fill(prunedMass);
       h_trimmedMass->Fill(trimmedMass);
       h_filteredMass->Fill(filteredMass);
+
+      h_topJetMass->Fill(topJetMass);
 
       std::cout<<"pt: "<<pt<<std::endl;
       std::cout<<"eta: "<<eta<<std::endl;
@@ -180,6 +186,8 @@ jetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       std::cout<<"prunedMass: "<<prunedMass<<std::endl;
       std::cout<<"trimmedMass: "<<trimmedMass<<std::endl;
       std::cout<<"filteredMass: "<<filteredMass<<std::endl;
+
+      std::cout<<"topJetMass:"<<topJetMass<<std::endl;
 
       std::cout<<std::endl;
     }
@@ -225,6 +233,8 @@ jetAnalyzer::endJob()
   h_prunedMass->Write();
   h_trimmedMass->Write();
   h_filteredMass->Write();
+
+  h_topJetMass->Write();
 
   f->Close();
 }
