@@ -60,7 +60,7 @@ private:
 
   // ----------member data ---------------------------
   edm::InputTag* jets_;
-  
+
   TH1F* h_tau1 = new TH1F("tau1",";#tau_{1}",25,0,1);
   TH1F* h_tau2 = new TH1F("tau2",";#tau_{2}",25,0,1);
   TH1F* h_tau3 = new TH1F("tau3",";#tau_{3}",25,0,1);
@@ -129,43 +129,77 @@ jetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       float pt = jet_iter->pt();
       float eta = jet_iter->eta();
 
-      float tau1 = jet_iter->userFloat("Njettiness:tau1");
-      float tau2 = jet_iter->userFloat("Njettiness:tau2");
-      float tau3 = jet_iter->userFloat("Njettiness:tau3");
+      int cutbasedId=0, fullId=0;
+      float fullDiscriminant=0, qgLikelihood=0, tau1=0, tau2=0, tau3=0, QjetsVolatility=0, prunedMass=0, trimmedMass=0, filteredMass=0, topJetMass;
 
-      int cutbasedId = jet_iter->userInt("pileupJetIdEvaluator:cutbasedId");
-       
-      float fullDiscriminant = jet_iter->userFloat("pileupJetIdEvaluator:fullDiscriminant");
-      int fullId = jet_iter->userInt("pileupJetIdEvaluator:fullId");
-
-      float qgLikelihood = jet_iter->userFloat("QGTagger:qgLikelihood");
-
-      float QjetsVolatility = jet_iter->userFloat("QJetsAdder:QjetsVolatility");
-
-      float prunedMass = jet_iter->userFloat("ca8PFJetsCHSPrunedLinks");
-      float trimmedMass = jet_iter->userFloat("ca8PFJetsCHSTrimmedLinks");
-      float filteredMass = jet_iter->userFloat("ca8PFJetsCHSFilteredLinks");
-
-      float topJetMass = jet_iter->userFloat("hepTopTagPFJetsCHSLinks");
-
-      h_tau1->Fill(tau1);
-      h_tau2->Fill(tau2);
-      h_tau3->Fill(tau3);
-
-      h_fullDiscriminant->Fill(fullDiscriminant);
+      if ( jets_->label().compare("patJetsAK5PFCHS")==0 ){
+	cutbasedId = jet_iter->userInt("pileupJetIdEvaluator:cutbasedId");
+	
+	fullDiscriminant = jet_iter->userFloat("pileupJetIdEvaluator:fullDiscriminant");
+	fullId = jet_iter->userInt("pileupJetIdEvaluator:fullId");
+	
+	qgLikelihood = jet_iter->userFloat("QGTagger:qgLikelihood");
+	
+	h_fullDiscriminant->Fill(fullDiscriminant);
+	
+	h_cutbasedId->Fill(cutbasedId);
+	h_fullId->Fill(fullId);
+	
+	h_qgLikelihood->Fill(qgLikelihood);
+      }
+      else if (jets_->label().compare("patJetsCA8PFCHS")==0 ){
+	
+	tau1 = jet_iter->userFloat("NjettinessCA8:tau1");
+	tau2 = jet_iter->userFloat("NjettinessCA8:tau2");
+	tau3 = jet_iter->userFloat("NjettinessCA8:tau3");
+	
+	QjetsVolatility = jet_iter->userFloat("QJetsAdderCA8:QjetsVolatility");
+	
+	prunedMass = jet_iter->userFloat("ca8PFJetsCHSPrunedLinks");
+	trimmedMass = jet_iter->userFloat("ca8PFJetsCHSTrimmedLinks");
+	filteredMass = jet_iter->userFloat("ca8PFJetsCHSFilteredLinks");
+	
+	topJetMass = jet_iter->userFloat("cmsTopTagPFJetsCHSLinksCA8");
+	
+	h_tau1->Fill(tau1);
+	h_tau2->Fill(tau2);
+	h_tau3->Fill(tau3);
+	
+	h_QjetsVolatility->Fill(QjetsVolatility);
+	
+	h_prunedMass->Fill(prunedMass);
+	h_trimmedMass->Fill(trimmedMass);
+	h_filteredMass->Fill(filteredMass);
+	
+	h_topJetMass->Fill(topJetMass);
+      }
       
-      h_cutbasedId->Fill(cutbasedId);
-      h_fullId->Fill(fullId);
-      
-      h_qgLikelihood->Fill(qgLikelihood);
-
-      h_QjetsVolatility->Fill(QjetsVolatility);
-
-      h_prunedMass->Fill(prunedMass);
-      h_trimmedMass->Fill(trimmedMass);
-      h_filteredMass->Fill(filteredMass);
-
-      h_topJetMass->Fill(topJetMass);
+      else if (jets_->label().compare("patJetsAK8PFCHS")==0 ){
+	
+	tau1 = jet_iter->userFloat("NjettinessAK8:tau1");
+	tau2 = jet_iter->userFloat("NjettinessAK8:tau2");
+	tau3 = jet_iter->userFloat("NjettinessAK8:tau3");
+	
+	QjetsVolatility = jet_iter->userFloat("QJetsAdderAK8:QjetsVolatility");
+	
+	prunedMass = jet_iter->userFloat("ak8PFJetsCHSPrunedLinks");
+	trimmedMass = jet_iter->userFloat("ak8PFJetsCHSTrimmedLinks");
+	filteredMass = jet_iter->userFloat("ak8PFJetsCHSFilteredLinks");
+	
+	topJetMass = jet_iter->userFloat("cmsTopTagPFJetsCHSLinksAK8");
+	
+	h_tau1->Fill(tau1);
+	h_tau2->Fill(tau2);
+	h_tau3->Fill(tau3);
+	
+	h_QjetsVolatility->Fill(QjetsVolatility);
+	
+	h_prunedMass->Fill(prunedMass);
+	h_trimmedMass->Fill(trimmedMass);
+	h_filteredMass->Fill(filteredMass);
+	
+	h_topJetMass->Fill(topJetMass);
+      }
 
       std::cout<<"pt: "<<pt<<std::endl;
       std::cout<<"eta: "<<eta<<std::endl;
