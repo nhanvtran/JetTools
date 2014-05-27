@@ -132,7 +132,7 @@ jetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       int cutbasedId=0, fullId=0;
       float fullDiscriminant=0, qgLikelihood=0, tau1=0, tau2=0, tau3=0, QjetsVolatility=0, prunedMass=0, trimmedMass=0, filteredMass=0, topJetMass;
 
-      if ( jets_->label().compare("patJetsAK5PFCHS")==0 ){
+      if ( jets_->label().compare("patJetsAK5PFCHS")==0 || jets_->label().compare("patJetsAK4PFCHS")==0){
 	cutbasedId = jet_iter->userInt("pileupJetIdEvaluator:cutbasedId");
 	
 	fullDiscriminant = jet_iter->userFloat("pileupJetIdEvaluator:fullDiscriminant");
